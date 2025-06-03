@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "892623557940",
+    "project_id": "medgastro6",
+    "storage_bucket": "medgastro6.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:892623557940:android:13bbc85e1d0b65fbee0161",
+        "android_client_info": {
+          "package_name": "com.example.medgastro6"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC-9qJOd8USOgkFOlCI05NJa7jvlWD9JQE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
