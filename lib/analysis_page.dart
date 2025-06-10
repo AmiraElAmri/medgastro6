@@ -1,5 +1,7 @@
+import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
 import 'package:flutter/foundation.dart'; // Pour Platform.isWeb
 
@@ -46,18 +48,58 @@ class _AnalysisPageState extends State<AnalysisPage> {
     }
   }
 
-  void _generateAnswer() {
+  void _generateAnswer() async {
     if (_formKey.currentState!.validate() && _selectedImage != null) {
       setState(() => _isLoading = true);
 
-      // Simulation d'un traitement d'IA
-      Future.delayed(Duration(seconds: 2), () {
+      final String apiUrl = "https://vqa-medical-model-api.hf.space/predict";
+
+      try {
+        var request = http.MultipartRequest('POST', Uri.parse(apiUrl));
+
+        if (kIsWeb) {
+          // Pour le web : envoyer l'image en tant que List<int>
+          request.files.add(
+            http.MultipartFile.fromBytes(
+              'image',
+              _selectedImage,
+              filename: 'image.jpg',
+            ),
+          );
+        } else {
+          // Pour Android/iOS : envoyer un fichier image réel
+          File imageFile = _selectedImage;
+          var stream = http.ByteStream(imageFile.openRead());
+          var length = await imageFile.length();
+          var multipartFile = http.MultipartFile(
+            'image',
+            stream,
+            length,
+            filename: imageFile.path.split('/').last,
+          );
+          request.files.add(multipartFile);
+        }
+
+        // Ajouter la question au formulaire
+        request.fields['question'] = _questionController.text;
+
+        // Envoyer la requête
+        var response = await request.send();
+
+        // Lire la réponse
+        final resp = await response.stream.bytesToString();
+        final data = jsonDecode(resp);
+
         setState(() {
           _isLoading = false;
-          _answer =
-          "Analysis in progress... (This feature will be implemented with an AI model)";
+          _answer = data["answer"];
         });
-      });
+      } catch (e) {
+        setState(() {
+          _isLoading = false;
+          _answer = "❌ Error: $e";
+        });
+      }
     }
   }
 
